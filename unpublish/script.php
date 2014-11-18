@@ -55,7 +55,7 @@ function init ( array $options = array() ) {
 
   include_once('inc/common.inc');
 
-  include_once('inc/default_commands.inc');
+  include_once('inc/commands.inc');
   
   include_once('inc/datasource.inc');
 

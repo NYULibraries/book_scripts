@@ -35,6 +35,28 @@ function collection_nid($identifier) {
 
 }
 
+function collection_title_by_identifier($identifier) {
+
+  $query = new EntityFieldQuery;
+  
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dlts_collection')
+    ->fieldCondition('field_identifier', 'value', $identifier, '=')
+    ->execute();
+    
+  if (empty($result['node'])) return FALSE;
+
+  $keys = array_keys($result['node']);
+  
+  $node = node_load((int)$keys[0]);
+  
+  if ($node) {
+    return $node->title ;
+  }
+
+}
+
 function collection_books($identifier) {
 
   $nid = collection_nid($identifier);
