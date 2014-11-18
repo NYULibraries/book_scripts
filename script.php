@@ -55,9 +55,11 @@ function init ( array $options = array() ) {
 
   include_once('inc/common.inc');
 
-  include_once('inc/commands.inc');
+  include_once('inc/commands/default.inc');
   
-  include_once('inc/datasource.inc');
+  include_once('inc/datasource/default.inc');
+  
+  include_once('inc/content/default.inc');
 
   $caller = (isset($trace[0]['file']) ? $trace[0]['file'] : __FILE__);
 

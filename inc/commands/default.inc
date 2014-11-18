@@ -4,6 +4,10 @@
 
 function default_commands () {
 
+  foreach ( file_scan_directory( __DIR__, '/(.*)\.inc$/', array('recurse' => FALSE )) as $file) {
+    include_once($file->uri);
+  }
+
   return array(
 
     array(
