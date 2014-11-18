@@ -2,29 +2,31 @@
 
 /** list of commands */
 
-function default_commands () {
+function liberator_metadata_fix_commands() {
+
   return array(
 
     array(
       'label' => t('Fix books metadata according to DLTSBOOKS-39'),
       'callback' => array(
-        'fix_books',
+        'liberator_metadata_fix_fix_books',
       ),
     ),
     
     array(
       'label' => t('Fix Multi Vol. Books title according to DLTSBOOKS-39'),
       'callback' => array(
-        'fix_multivol_books',
+        'liberator_metadata_fix_fix_multivol_books',
       ),
     ),
 
   );
+
 }
 
 /** commands callback */
 
-function fix_books() {
+function liberator_metadata_fix_fix_books() {
 
   $books = collection_books('94b17163-75c2-42c4-b258-754e9fc9e0ea');
   
@@ -58,7 +60,7 @@ function fix_books() {
 
 }
 
-function fix_multivol_books() {
+function liberator_metadata_fix_fix_multivol_books() {
 
   $books = collection_books('94b17163-75c2-42c4-b258-754e9fc9e0ea');
   
