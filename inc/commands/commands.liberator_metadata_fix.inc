@@ -7,14 +7,14 @@ function liberator_metadata_fix_commands() {
   return array(
 
     array(
-      'label' => t('Fix books metadata according to DLTSBOOKS-39'),
+      'label' => t('Update Liberator books metadata according to DLTSBOOKS-39'),
       'callback' => array(
         'liberator_metadata_fix_fix_books',
       ),
     ),
     
     array(
-      'label' => t('Fix Multi Vol. Books title according to DLTSBOOKS-39'),
+      'label' => t('Update Liberator Multi Vol. Books title according to DLTSBOOKS-39'),
       'callback' => array(
         'liberator_metadata_fix_fix_multivol_books',
       ),
