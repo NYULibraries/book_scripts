@@ -77,6 +77,27 @@ function collection_books($identifier) {
 
 }
 
+function collection_books_published($identifier) {
+
+  $nid = collection_nid($identifier);
+  
+  $query = new EntityFieldQuery;
+  
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dlts_book')
+    ->propertyCondition('status', NODE_PUBLISHED)    
+    ->fieldCondition('field_collection', 'nid', $nid, '=')
+    ->execute();
+    
+  if (empty($result['node'])) return FALSE;
+
+  $keys = array_keys($result['node']);
+
+  return $keys;
+
+}
+
 function multivol_nid($identifier) {
 
   $query = new EntityFieldQuery;
