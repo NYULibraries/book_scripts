@@ -3,8 +3,7 @@
 /**
  * A command-line Drupal script to create a dummy book
  *
- * drush -r --user=1 --uri=http://localhost/book_test scr script.php
- * drush scr script.php
+ * drush php-script script.php --user=1 --uri=http://dev-dl-pa.home.nyu.edu/books
  */
  
 function show_help(array $commands = array()) {
@@ -36,15 +35,11 @@ function show_options (array $commands = array()) {
 function run ($task, array $commands = array()) {
   if (isset($commands[$task]) && isset($commands[$task]['callback'])) {
     foreach ($commands[$task]['callback'] as $callback) {
-      if (function_exists($callback)) {
-        $callback();
-      }
+      if ( function_exists ( $callback ) ) $callback() ;
     }
   }
   else {
-    drush_print('');
-    drush_print(t('ERROR: Unable to perform task'));
-    drush_print('');
+    drush_log ( dt( 'ERROR: Unable to perform @task', array ( '@task' => $task ) ), 'error' ) ;
     show_options($commands);
   }
 }
@@ -75,14 +70,26 @@ function init ( array $options = array() ) {
     ),
   );
   
-  if (isset($args[1])) {
-    run($args[1], $commands);
-  }
+  if ( $task = drush_get_option('task') ) {
+    
+    drush_log( dt( 'Loading task "@task"' , array( '@task' => $task ) ), 'status') ;
+        
+    foreach ( $commands as $key => $command ) if ( $commands[$key]['label'] == $task ) $action = $key ;
+
+    if ( $action ) run ( $action, $commands ) ;
+
+    else drush_log('Unable to load task', 'error') ;
+
+  }  
   
   else {
-    show_options($commands);
+  
+    if ( isset( $args[1])  ) run( $args[1], $commands ) ;
+  
+    else  show_options( $commands ) ;
+  
   }
 
 }
 
-init( array( 'commands' => array(), ) );
+init( array( 'commands' => array() ) );

@@ -27,6 +27,14 @@ function default_commands() {
       ),
     ),
     
+    array(
+      'label' => t('Given a book identifier generate all derivative image'),
+      'callback' => array(
+        'generate_book_pages_representative_image_thumbnails',
+      ),
+    ),
+    
+    
   );  
 
   foreach ( file_scan_directory( __DIR__, '/commands.(.*)\.inc$/', array('recurse' => FALSE )) as $file) {
@@ -182,5 +190,71 @@ function publish_books ( ) {
     }
 
   }
+  
+}
+
+/** 
+ * Given a book identifier, generate all derivative image.
+ */
+function generate_book_pages_representative_image_thumbnails ( ) {
+
+  if ( ! $book_identifier = drush_get_option('book_identifier') ) $book_identifier = drush_prompt( 'Book identifier', NULL, TRUE ) ;
+  
+  if ( ! $book_identifier ) return drush_log ( 'Invalid book identifier' ) ;
+
+  $book_pages = drush_get_option('book_pages') ;  
+  
+  $book_nid = book_nid( $book_identifier );
+  
+  if ( $book_nid ) {
+  
+    if ( empty ( $book_pages ) ) $book_pages = book_pages_by_book_nid ( $book_nid ) ;
+    
+    else $book_pages = book_pages_by_book_nid_and_sequence_numbers ( $book_nid, explode ( ',', $book_pages ) ) ;
+    
+    // Load the node by NID
+    $book_entity = node_load( $book_nid );
+
+    // Wrap it with Entity API
+    $book_ewrapper = entity_metadata_wrapper('node', $book_entity);
+        
+    drush_log( 'Book: ' . $book_ewrapper->title->value(array('sanitize' => TRUE)), 'status' );
+    
+    $styles = array_keys ( image_styles() ) ;
+    
+    $styles_string = implode(', ', $styles ) ;
+    
+    foreach ( $book_pages as $page ) {
+    
+      // Wrap it with Entity API
+      $book_page_ewrapper = entity_metadata_wrapper('node', $page);
+    
+      $sequence_number = $book_page_ewrapper->field_sequence_number->value();
+      
+      $service_copy = $book_page_ewrapper->field_service_copy->value();
+      
+      drush_log( dt('Book page @page: Generating image styles: @styles', array( '@page' => $sequence_number, '@styles' => $styles_string ) ) , 'status' );    
+      
+      foreach ( $styles as $style ) {
+
+       // destination of the derivative image.
+       $destination = image_style_path($style, $service_copy['uri']);
+       
+       // remove file if exists
+       if ( file_exists ( $destination ) ) file_unmanaged_delete ( $destination ) ;
+       
+       // create derivative image.
+       image_style_create_derivative( image_style_load( $style ), $service_copy['uri'], $destination);
+       
+       // save node
+       $book_page_ewrapper->save();
+       
+      }
+        
+    }
+        
+  }
+  
+  else return drush_log ( dt('Invalid book @identifier' , array ( '@identifier' => $book_identifier ) ), 'error' ) ;
   
 }
