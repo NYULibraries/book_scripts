@@ -17,7 +17,7 @@ function collections_identifiers ( ) {
 
 }
 
-function collection_nid($identifier) {
+function collection_nid ( $identifier ) {
 
   $query = new EntityFieldQuery;
 
