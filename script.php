@@ -60,7 +60,7 @@ function init ( array $options = array() ) {
 
   $default_commands = default_commands();
 
-  $commands = array_merge($default_commands, $options['commands']);
+  $commands = array_merge( $default_commands, $options['commands'] );
 
   // Add exit command to end of the commands options  
   $commands[] = array(

@@ -34,6 +34,12 @@ function default_commands() {
       ),
     ),
     
+    array(
+      'label' => t('Unpublish all maps in a collection'),
+      'callback' => array(
+        'unpublish_maps',
+      ),
+    ),    
     
   );  
 
@@ -131,6 +137,57 @@ function unpublish_books ( ) {
         $book_ewrapper->status->set(0);
         
         $book_ewrapper->save(); 
+
+      }
+
+    }
+
+  }
+  
+}
+
+function unpublish_maps ( ) {
+  
+  $traces = debug_backtrace();
+  
+  $args = array();
+  
+  foreach ( $traces as $index => $trace ) {
+  
+    if ( isset( $traces[$index]['function'] ) ) {
+      if ( 
+        $traces[$index]['function'] == 'drush_core_php_script' 
+      ) {
+        
+        $args = $traces[$index]['args'];
+
+        if ( ($key = array_search('script.php', $args)) !== false) {
+          unset($args[$key]);
+        }        
+        
+      }
+    }
+  }
+  
+  foreach ( $args as $arg ) {
+  
+    $collection_nid = collection_nid( $arg );
+    
+    if ( $collection_nid ) {
+
+      $maps = collection_maps($arg);      
+      
+      foreach ( $maps as $map ) {
+      
+        // Load the node by NID
+        $map_entity = node_load($map);
+
+        // Wrap it with Entity API
+        $map_ewrapper = entity_metadata_wrapper('node', $map_entity);
+        
+        $map_ewrapper->status->set(0);
+        
+        $map_ewrapper->save(); 
 
       }
 
