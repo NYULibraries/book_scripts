@@ -32,10 +32,13 @@ function show_options (array $commands = array()) {
 
 }
 
-function run ($task, array $commands = array()) {
-  if (isset($commands[$task]) && isset($commands[$task]['callback'])) {
+function run ($task, array $commands = array(), array $arguments = array()) {
+  if ( isset ( $commands[$task] ) && isset ( $commands[$task]['callback'] ) ) {
     foreach ($commands[$task]['callback'] as $callback) {
-      if ( function_exists ( $callback ) ) $callback() ;
+      if ( function_exists ( $callback ) ) {
+        if ( !empty ( $arguments ) ) $callback( $arguments ) ;
+        else $callback() ;
+      }
     }
   }
   else {
@@ -72,12 +75,25 @@ function init ( array $options = array() ) {
   
   if ( $task = drush_get_option('task') ) {
     
-    drush_log( dt( 'Loading task "@task"' , array( '@task' => $task ) ), 'status') ;
-        
     foreach ( $commands as $key => $command ) if ( $commands[$key]['label'] == $task ) $action = $key ;
 
-    if ( $action ) run ( $action, $commands ) ;
-
+    if ( $action ) {
+      drush_log( dt( 'Loading task "@task"' , array( '@task' => $task ) ), 'ok') ;
+      $arguments = array () ;
+      /** Check if this action requires arguments */
+      if ( isset ( $commands[$action]['arguments'] ) ) {
+        foreach ( $commands[$action]['arguments'] as $argument => $require ) {
+          $argument_value = drush_get_option( $argument ) ;          
+          if ( $require && empty ( $argument_value ) ) {
+            drush_log ( dt ( 'Unable to load task; "@task" task require argument "@argument" to run' , array ( '@task' => $task , '@argument' => $argument ) ), 'error') ;
+            drush_die () ;
+          }
+          $arguments[$argument] = $argument_value ;
+        }
+      }
+      run ( $action , $commands , $arguments ) ;
+    }
+    
     else drush_log('Unable to load task', 'error') ;
 
   }  
