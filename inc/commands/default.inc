@@ -4,8 +4,8 @@
 
 function default_commands() {
 
-  $commands = array(
-
+  $commands = array (
+  
     array(
       'label' => t('List collections identifiers'),
       'callback' => array(
@@ -39,7 +39,15 @@ function default_commands() {
       'callback' => array(
         'unpublish_maps',
       ),
-    ),    
+    ),   
+     
+    array (
+      'label' => t('List all books'),
+      'callback' => array(
+        'list_all_books',
+      ),
+      'arguments' => array ( /** method arguments */ ),      
+    ),       
     
   );  
 
@@ -66,6 +74,24 @@ function default_commands() {
 }
 
 /** commands callback */
+
+function list_all_books ( ) {
+
+  foreach ( books ( ) as $book ) {
+      
+    // Load the node by NID
+    $book_entity = node_load($book);
+
+    // Wrap it with Entity API
+    $book_ewrapper = entity_metadata_wrapper('node', $book_entity);
+      
+    $book_identifier = $book_ewrapper->field_identifier->value();
+        
+    drush_print ( $book_identifier ) ;
+      
+  }
+
+}
 
 function list_collections() {
 

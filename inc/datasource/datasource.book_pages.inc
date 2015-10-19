@@ -35,7 +35,7 @@ function book_pages_nid_by_book_identifier ( $book_nid ) {
 
 }
 
-function book_pages_by_book_nid ( $book_nid ) {
+function book_stitched_pages_by_book_nid ( $book_nid ) {
 
   $pages = array () ;
 
@@ -43,7 +43,7 @@ function book_pages_by_book_nid ( $book_nid ) {
 
   $result = $query
     ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'dlts_book_page')
+    ->entityCondition('bundle', 'dlts_book_stitched_page')
     ->fieldCondition('field_book', 'nid', $book_nid, '=')    
     ->execute();
 
