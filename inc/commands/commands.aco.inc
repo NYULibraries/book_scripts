@@ -12,11 +12,60 @@ function aco_commands() {
         'update_rights_field_JIRA_DLTSACO_111',
       ),
     ),
+    
+    array(
+      'label' => t('JIRA DLTSACO-319: Number field should be blank for ACO books'),
+      'callback' => array(
+        'DLTSACO_319',
+      ),
+    ),
+    
 
   );  
 
   return $commands;
 
+}
+
+/** 
+ * JIRA DLTSACO-319: Number field should be blank for ACO books
+ * https://jira.nyu.edu/browse/DLTSACO-319
+ *
+ * I was looking at the descriptive metadata for nyu_aco000857 in the Viewer and 
+ * I saw that the Number field had stuff in it. This field should be blank for all
+ * ACO titles. It should be filled in only for The Liberator and any other magazine
+ * that comes along in the future.
+ */
+function DLTSACO_319() {
+  $count = 0;
+  $collections_identifier = array(
+    'f88f5562-2152-41a7-979f-86a6fb4149aa',
+    '2b996e54-da86-4622-81d1-090b52e25445',
+    '7b71e702-e6b8-4f09-90c9-e5c2906f3050',
+    '9c8e89ce-c728-4e1d-9389-48a0222be0a5',
+  );
+  foreach ($collections_identifier as $identifier) {
+    $nid = collection_nid($identifier);
+    if ($nid) {
+      drush_log(dt('Books from @identifier node/@nid', array('@identifier' => $identifier, '@nid' => $nid)), 'ok');
+      foreach (collection_books($identifier) as $book) {
+        // Load the node by NID
+        $entity = node_load($book);   
+        // Wrap it with Entity API
+        $wrapper = entity_metadata_wrapper('node', $entity);             
+        drush_log(dt('Updating  @title', array( '@title' => $wrapper->title->value(array('sanitize' => TRUE)))), 'ok');
+        $wrapper->field_number->set('');
+        if ($wrapper->save()) {
+          $count++;
+        }
+        unset($entity);
+        unset($wrapper);
+        unset($book);
+      }
+      unset($nid);
+    }
+  }
+  drush_log(dt('@count books where updated', array('@count' => $count)), 'ok');
 }
 
 /** 
